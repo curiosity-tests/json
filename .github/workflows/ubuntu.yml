@@ -45,15 +45,26 @@ jobs:
     steps:
       - name: Install curl/bash for action-checkout (racecar; ungated, both arms)
         shell: sh
+        # Best-effort probe, never a gate. Inside a container job running as a
+        # non-root user, apt-get cannot write /var/lib/apt/lists and exits 100,
+        # which failed ardupilot's build job at step 3 before any of its own work
+        # ran. GitHub uses `sh -e`, so a failing command aborts the script and a
+        # trailing `exit 0` would never be reached -- hence `|| true` per branch
+        # plus continue-on-error. If curl/bash are genuinely missing,
+        # action-checkout fails next with a message that names the real problem.
+        continue-on-error: true
         run: |
           command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1 && exit 0
+          SUDO=
+          if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then SUDO=sudo; fi
           if command -v apt-get >/dev/null 2>&1; then
-            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl ca-certificates bash
-          elif command -v apk >/dev/null 2>&1; then apk add --no-cache curl ca-certificates bash
-          elif command -v dnf >/dev/null 2>&1; then dnf install -y curl ca-certificates bash
-          elif command -v yum >/dev/null 2>&1; then yum install -y curl ca-certificates bash
-          elif command -v zypper >/dev/null 2>&1; then zypper -n install curl ca-certificates bash
+            { $SUDO apt-get update -qq && DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y -qq curl ca-certificates bash; } || true
+          elif command -v apk >/dev/null 2>&1; then $SUDO apk add --no-cache curl ca-certificates bash || true
+          elif command -v dnf >/dev/null 2>&1; then $SUDO dnf install -y curl ca-certificates bash || true
+          elif command -v yum >/dev/null 2>&1; then $SUDO yum install -y curl ca-certificates bash || true
+          elif command -v zypper >/dev/null 2>&1; then $SUDO zypper -n install curl ca-certificates bash || true
           fi
+          exit 0
 
       - name: Checkout code
         uses: crashappsec/action-checkout@main
@@ -154,15 +165,26 @@ jobs:
     steps:
       - name: Install curl/bash for action-checkout (racecar; ungated, both arms)
         shell: sh
+        # Best-effort probe, never a gate. Inside a container job running as a
+        # non-root user, apt-get cannot write /var/lib/apt/lists and exits 100,
+        # which failed ardupilot's build job at step 3 before any of its own work
+        # ran. GitHub uses `sh -e`, so a failing command aborts the script and a
+        # trailing `exit 0` would never be reached -- hence `|| true` per branch
+        # plus continue-on-error. If curl/bash are genuinely missing,
+        # action-checkout fails next with a message that names the real problem.
+        continue-on-error: true
         run: |
           command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1 && exit 0
+          SUDO=
+          if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then SUDO=sudo; fi
           if command -v apt-get >/dev/null 2>&1; then
-            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl ca-certificates bash
-          elif command -v apk >/dev/null 2>&1; then apk add --no-cache curl ca-certificates bash
-          elif command -v dnf >/dev/null 2>&1; then dnf install -y curl ca-certificates bash
-          elif command -v yum >/dev/null 2>&1; then yum install -y curl ca-certificates bash
-          elif command -v zypper >/dev/null 2>&1; then zypper -n install curl ca-certificates bash
+            { $SUDO apt-get update -qq && DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y -qq curl ca-certificates bash; } || true
+          elif command -v apk >/dev/null 2>&1; then $SUDO apk add --no-cache curl ca-certificates bash || true
+          elif command -v dnf >/dev/null 2>&1; then $SUDO dnf install -y curl ca-certificates bash || true
+          elif command -v yum >/dev/null 2>&1; then $SUDO yum install -y curl ca-certificates bash || true
+          elif command -v zypper >/dev/null 2>&1; then $SUDO zypper -n install curl ca-certificates bash || true
           fi
+          exit 0
 
       - name: Install git, clang-tools, iwyu (ci_single_binaries), and unzip
         run: apt-get update ; apt-get install -y git clang-tools iwyu unzip
@@ -197,15 +219,26 @@ jobs:
     steps:
       - name: Install curl/bash for action-checkout (racecar; ungated, both arms)
         shell: sh
+        # Best-effort probe, never a gate. Inside a container job running as a
+        # non-root user, apt-get cannot write /var/lib/apt/lists and exits 100,
+        # which failed ardupilot's build job at step 3 before any of its own work
+        # ran. GitHub uses `sh -e`, so a failing command aborts the script and a
+        # trailing `exit 0` would never be reached -- hence `|| true` per branch
+        # plus continue-on-error. If curl/bash are genuinely missing,
+        # action-checkout fails next with a message that names the real problem.
+        continue-on-error: true
         run: |
           command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1 && exit 0
+          SUDO=
+          if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then SUDO=sudo; fi
           if command -v apt-get >/dev/null 2>&1; then
-            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl ca-certificates bash
-          elif command -v apk >/dev/null 2>&1; then apk add --no-cache curl ca-certificates bash
-          elif command -v dnf >/dev/null 2>&1; then dnf install -y curl ca-certificates bash
-          elif command -v yum >/dev/null 2>&1; then yum install -y curl ca-certificates bash
-          elif command -v zypper >/dev/null 2>&1; then zypper -n install curl ca-certificates bash
+            { $SUDO apt-get update -qq && DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y -qq curl ca-certificates bash; } || true
+          elif command -v apk >/dev/null 2>&1; then $SUDO apk add --no-cache curl ca-certificates bash || true
+          elif command -v dnf >/dev/null 2>&1; then $SUDO dnf install -y curl ca-certificates bash || true
+          elif command -v yum >/dev/null 2>&1; then $SUDO yum install -y curl ca-certificates bash || true
+          elif command -v zypper >/dev/null 2>&1; then $SUDO zypper -n install curl ca-certificates bash || true
           fi
+          exit 0
 
       - name: Install build-essential
         run: apt-get update ; apt-get install -y build-essential unzip wget git libssl-dev
@@ -288,15 +321,26 @@ jobs:
     steps:
       - name: Install curl/bash for action-checkout (racecar; ungated, both arms)
         shell: sh
+        # Best-effort probe, never a gate. Inside a container job running as a
+        # non-root user, apt-get cannot write /var/lib/apt/lists and exits 100,
+        # which failed ardupilot's build job at step 3 before any of its own work
+        # ran. GitHub uses `sh -e`, so a failing command aborts the script and a
+        # trailing `exit 0` would never be reached -- hence `|| true` per branch
+        # plus continue-on-error. If curl/bash are genuinely missing,
+        # action-checkout fails next with a message that names the real problem.
+        continue-on-error: true
         run: |
           command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1 && exit 0
+          SUDO=
+          if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then SUDO=sudo; fi
           if command -v apt-get >/dev/null 2>&1; then
-            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl ca-certificates bash
-          elif command -v apk >/dev/null 2>&1; then apk add --no-cache curl ca-certificates bash
-          elif command -v dnf >/dev/null 2>&1; then dnf install -y curl ca-certificates bash
-          elif command -v yum >/dev/null 2>&1; then yum install -y curl ca-certificates bash
-          elif command -v zypper >/dev/null 2>&1; then zypper -n install curl ca-certificates bash
+            { $SUDO apt-get update -qq && DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y -qq curl ca-certificates bash; } || true
+          elif command -v apk >/dev/null 2>&1; then $SUDO apk add --no-cache curl ca-certificates bash || true
+          elif command -v dnf >/dev/null 2>&1; then $SUDO dnf install -y curl ca-certificates bash || true
+          elif command -v yum >/dev/null 2>&1; then $SUDO yum install -y curl ca-certificates bash || true
+          elif command -v zypper >/dev/null 2>&1; then $SUDO zypper -n install curl ca-certificates bash || true
           fi
+          exit 0
 
       - name: Install g++-${{ matrix.compiler }}
         run: |
@@ -352,15 +396,26 @@ jobs:
     steps:
       - name: Install curl/bash for action-checkout (racecar; ungated, both arms)
         shell: sh
+        # Best-effort probe, never a gate. Inside a container job running as a
+        # non-root user, apt-get cannot write /var/lib/apt/lists and exits 100,
+        # which failed ardupilot's build job at step 3 before any of its own work
+        # ran. GitHub uses `sh -e`, so a failing command aborts the script and a
+        # trailing `exit 0` would never be reached -- hence `|| true` per branch
+        # plus continue-on-error. If curl/bash are genuinely missing,
+        # action-checkout fails next with a message that names the real problem.
+        continue-on-error: true
         run: |
           command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1 && exit 0
+          SUDO=
+          if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then SUDO=sudo; fi
           if command -v apt-get >/dev/null 2>&1; then
-            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl ca-certificates bash
-          elif command -v apk >/dev/null 2>&1; then apk add --no-cache curl ca-certificates bash
-          elif command -v dnf >/dev/null 2>&1; then dnf install -y curl ca-certificates bash
-          elif command -v yum >/dev/null 2>&1; then yum install -y curl ca-certificates bash
-          elif command -v zypper >/dev/null 2>&1; then zypper -n install curl ca-certificates bash
+            { $SUDO apt-get update -qq && DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y -qq curl ca-certificates bash; } || true
+          elif command -v apk >/dev/null 2>&1; then $SUDO apk add --no-cache curl ca-certificates bash || true
+          elif command -v dnf >/dev/null 2>&1; then $SUDO dnf install -y curl ca-certificates bash || true
+          elif command -v yum >/dev/null 2>&1; then $SUDO yum install -y curl ca-certificates bash || true
+          elif command -v zypper >/dev/null 2>&1; then $SUDO zypper -n install curl ca-certificates bash || true
           fi
+          exit 0
 
       - name: Checkout code
         uses: crashappsec/action-checkout@main
@@ -393,15 +448,26 @@ jobs:
     steps:
       - name: Install curl/bash for action-checkout (racecar; ungated, both arms)
         shell: sh
+        # Best-effort probe, never a gate. Inside a container job running as a
+        # non-root user, apt-get cannot write /var/lib/apt/lists and exits 100,
+        # which failed ardupilot's build job at step 3 before any of its own work
+        # ran. GitHub uses `sh -e`, so a failing command aborts the script and a
+        # trailing `exit 0` would never be reached -- hence `|| true` per branch
+        # plus continue-on-error. If curl/bash are genuinely missing,
+        # action-checkout fails next with a message that names the real problem.
+        continue-on-error: true
         run: |
           command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1 && exit 0
+          SUDO=
+          if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then SUDO=sudo; fi
           if command -v apt-get >/dev/null 2>&1; then
-            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl ca-certificates bash
-          elif command -v apk >/dev/null 2>&1; then apk add --no-cache curl ca-certificates bash
-          elif command -v dnf >/dev/null 2>&1; then dnf install -y curl ca-certificates bash
-          elif command -v yum >/dev/null 2>&1; then yum install -y curl ca-certificates bash
-          elif command -v zypper >/dev/null 2>&1; then zypper -n install curl ca-certificates bash
+            { $SUDO apt-get update -qq && DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y -qq curl ca-certificates bash; } || true
+          elif command -v apk >/dev/null 2>&1; then $SUDO apk add --no-cache curl ca-certificates bash || true
+          elif command -v dnf >/dev/null 2>&1; then $SUDO dnf install -y curl ca-certificates bash || true
+          elif command -v yum >/dev/null 2>&1; then $SUDO yum install -y curl ca-certificates bash || true
+          elif command -v zypper >/dev/null 2>&1; then $SUDO zypper -n install curl ca-certificates bash || true
           fi
+          exit 0
 
       - name: Checkout code
         uses: crashappsec/action-checkout@main
@@ -437,15 +503,26 @@ jobs:
     steps:
       - name: Install curl/bash for action-checkout (racecar; ungated, both arms)
         shell: sh
+        # Best-effort probe, never a gate. Inside a container job running as a
+        # non-root user, apt-get cannot write /var/lib/apt/lists and exits 100,
+        # which failed ardupilot's build job at step 3 before any of its own work
+        # ran. GitHub uses `sh -e`, so a failing command aborts the script and a
+        # trailing `exit 0` would never be reached -- hence `|| true` per branch
+        # plus continue-on-error. If curl/bash are genuinely missing,
+        # action-checkout fails next with a message that names the real problem.
+        continue-on-error: true
         run: |
           command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1 && exit 0
+          SUDO=
+          if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then SUDO=sudo; fi
           if command -v apt-get >/dev/null 2>&1; then
-            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl ca-certificates bash
-          elif command -v apk >/dev/null 2>&1; then apk add --no-cache curl ca-certificates bash
-          elif command -v dnf >/dev/null 2>&1; then dnf install -y curl ca-certificates bash
-          elif command -v yum >/dev/null 2>&1; then yum install -y curl ca-certificates bash
-          elif command -v zypper >/dev/null 2>&1; then zypper -n install curl ca-certificates bash
+            { $SUDO apt-get update -qq && DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y -qq curl ca-certificates bash; } || true
+          elif command -v apk >/dev/null 2>&1; then $SUDO apk add --no-cache curl ca-certificates bash || true
+          elif command -v dnf >/dev/null 2>&1; then $SUDO dnf install -y curl ca-certificates bash || true
+          elif command -v yum >/dev/null 2>&1; then $SUDO yum install -y curl ca-certificates bash || true
+          elif command -v zypper >/dev/null 2>&1; then $SUDO zypper -n install curl ca-certificates bash || true
           fi
+          exit 0
 
       - name: Checkout code
         uses: crashappsec/action-checkout@main
@@ -479,15 +556,26 @@ jobs:
     steps:
       - name: Install curl/bash for action-checkout (racecar; ungated, both arms)
         shell: sh
+        # Best-effort probe, never a gate. Inside a container job running as a
+        # non-root user, apt-get cannot write /var/lib/apt/lists and exits 100,
+        # which failed ardupilot's build job at step 3 before any of its own work
+        # ran. GitHub uses `sh -e`, so a failing command aborts the script and a
+        # trailing `exit 0` would never be reached -- hence `|| true` per branch
+        # plus continue-on-error. If curl/bash are genuinely missing,
+        # action-checkout fails next with a message that names the real problem.
+        continue-on-error: true
         run: |
           command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1 && exit 0
+          SUDO=
+          if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then SUDO=sudo; fi
           if command -v apt-get >/dev/null 2>&1; then
-            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl ca-certificates bash
-          elif command -v apk >/dev/null 2>&1; then apk add --no-cache curl ca-certificates bash
-          elif command -v dnf >/dev/null 2>&1; then dnf install -y curl ca-certificates bash
-          elif command -v yum >/dev/null 2>&1; then yum install -y curl ca-certificates bash
-          elif command -v zypper >/dev/null 2>&1; then zypper -n install curl ca-certificates bash
+            { $SUDO apt-get update -qq && DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y -qq curl ca-certificates bash; } || true
+          elif command -v apk >/dev/null 2>&1; then $SUDO apk add --no-cache curl ca-certificates bash || true
+          elif command -v dnf >/dev/null 2>&1; then $SUDO dnf install -y curl ca-certificates bash || true
+          elif command -v yum >/dev/null 2>&1; then $SUDO yum install -y curl ca-certificates bash || true
+          elif command -v zypper >/dev/null 2>&1; then $SUDO zypper -n install curl ca-certificates bash || true
           fi
+          exit 0
 
       - name: Install git and unzip
         run: apt-get update ; apt-get install -y git unzip
@@ -531,15 +619,26 @@ jobs:
     steps:
       - name: Install curl/bash for action-checkout (racecar; ungated, both arms)
         shell: sh
+        # Best-effort probe, never a gate. Inside a container job running as a
+        # non-root user, apt-get cannot write /var/lib/apt/lists and exits 100,
+        # which failed ardupilot's build job at step 3 before any of its own work
+        # ran. GitHub uses `sh -e`, so a failing command aborts the script and a
+        # trailing `exit 0` would never be reached -- hence `|| true` per branch
+        # plus continue-on-error. If curl/bash are genuinely missing,
+        # action-checkout fails next with a message that names the real problem.
+        continue-on-error: true
         run: |
           command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1 && exit 0
+          SUDO=
+          if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then SUDO=sudo; fi
           if command -v apt-get >/dev/null 2>&1; then
-            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl ca-certificates bash
-          elif command -v apk >/dev/null 2>&1; then apk add --no-cache curl ca-certificates bash
-          elif command -v dnf >/dev/null 2>&1; then dnf install -y curl ca-certificates bash
-          elif command -v yum >/dev/null 2>&1; then yum install -y curl ca-certificates bash
-          elif command -v zypper >/dev/null 2>&1; then zypper -n install curl ca-certificates bash
+            { $SUDO apt-get update -qq && DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y -qq curl ca-certificates bash; } || true
+          elif command -v apk >/dev/null 2>&1; then $SUDO apk add --no-cache curl ca-certificates bash || true
+          elif command -v dnf >/dev/null 2>&1; then $SUDO dnf install -y curl ca-certificates bash || true
+          elif command -v yum >/dev/null 2>&1; then $SUDO yum install -y curl ca-certificates bash || true
+          elif command -v zypper >/dev/null 2>&1; then $SUDO zypper -n install curl ca-certificates bash || true
           fi
+          exit 0
 
       - name: Checkout code
         uses: crashappsec/action-checkout@main
@@ -572,15 +671,26 @@ jobs:
     steps:
       - name: Install curl/bash for action-checkout (racecar; ungated, both arms)
         shell: sh
+        # Best-effort probe, never a gate. Inside a container job running as a
+        # non-root user, apt-get cannot write /var/lib/apt/lists and exits 100,
+        # which failed ardupilot's build job at step 3 before any of its own work
+        # ran. GitHub uses `sh -e`, so a failing command aborts the script and a
+        # trailing `exit 0` would never be reached -- hence `|| true` per branch
+        # plus continue-on-error. If curl/bash are genuinely missing,
+        # action-checkout fails next with a message that names the real problem.
+        continue-on-error: true
         run: |
           command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1 && exit 0
+          SUDO=
+          if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then SUDO=sudo; fi
           if command -v apt-get >/dev/null 2>&1; then
-            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl ca-certificates bash
-          elif command -v apk >/dev/null 2>&1; then apk add --no-cache curl ca-certificates bash
-          elif command -v dnf >/dev/null 2>&1; then dnf install -y curl ca-certificates bash
-          elif command -v yum >/dev/null 2>&1; then yum install -y curl ca-certificates bash
-          elif command -v zypper >/dev/null 2>&1; then zypper -n install curl ca-certificates bash
+            { $SUDO apt-get update -qq && DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y -qq curl ca-certificates bash; } || true
+          elif command -v apk >/dev/null 2>&1; then $SUDO apk add --no-cache curl ca-certificates bash || true
+          elif command -v dnf >/dev/null 2>&1; then $SUDO dnf install -y curl ca-certificates bash || true
+          elif command -v yum >/dev/null 2>&1; then $SUDO yum install -y curl ca-certificates bash || true
+          elif command -v zypper >/dev/null 2>&1; then $SUDO zypper -n install curl ca-certificates bash || true
           fi
+          exit 0
 
       - name: Checkout code
         uses: crashappsec/action-checkout@main
@@ -624,15 +734,26 @@ jobs:
     steps:
       - name: Install curl/bash for action-checkout (racecar; ungated, both arms)
         shell: sh
+        # Best-effort probe, never a gate. Inside a container job running as a
+        # non-root user, apt-get cannot write /var/lib/apt/lists and exits 100,
+        # which failed ardupilot's build job at step 3 before any of its own work
+        # ran. GitHub uses `sh -e`, so a failing command aborts the script and a
+        # trailing `exit 0` would never be reached -- hence `|| true` per branch
+        # plus continue-on-error. If curl/bash are genuinely missing,
+        # action-checkout fails next with a message that names the real problem.
+        continue-on-error: true
         run: |
           command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1 && exit 0
+          SUDO=
+          if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then SUDO=sudo; fi
           if command -v apt-get >/dev/null 2>&1; then
-            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl ca-certificates bash
-          elif command -v apk >/dev/null 2>&1; then apk add --no-cache curl ca-certificates bash
-          elif command -v dnf >/dev/null 2>&1; then dnf install -y curl ca-certificates bash
-          elif command -v yum >/dev/null 2>&1; then yum install -y curl ca-certificates bash
-          elif command -v zypper >/dev/null 2>&1; then zypper -n install curl ca-certificates bash
+            { $SUDO apt-get update -qq && DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y -qq curl ca-certificates bash; } || true
+          elif command -v apk >/dev/null 2>&1; then $SUDO apk add --no-cache curl ca-certificates bash || true
+          elif command -v dnf >/dev/null 2>&1; then $SUDO dnf install -y curl ca-certificates bash || true
+          elif command -v yum >/dev/null 2>&1; then $SUDO yum install -y curl ca-certificates bash || true
+          elif command -v zypper >/dev/null 2>&1; then $SUDO zypper -n install curl ca-certificates bash || true
           fi
+          exit 0
 
       - name: Checkout code
         uses: crashappsec/action-checkout@main
@@ -664,15 +785,26 @@ jobs:
     steps:
       - name: Install curl/bash for action-checkout (racecar; ungated, both arms)
         shell: sh
+        # Best-effort probe, never a gate. Inside a container job running as a
+        # non-root user, apt-get cannot write /var/lib/apt/lists and exits 100,
+        # which failed ardupilot's build job at step 3 before any of its own work
+        # ran. GitHub uses `sh -e`, so a failing command aborts the script and a
+        # trailing `exit 0` would never be reached -- hence `|| true` per branch
+        # plus continue-on-error. If curl/bash are genuinely missing,
+        # action-checkout fails next with a message that names the real problem.
+        continue-on-error: true
         run: |
           command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1 && exit 0
+          SUDO=
+          if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then SUDO=sudo; fi
           if command -v apt-get >/dev/null 2>&1; then
-            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl ca-certificates bash
-          elif command -v apk >/dev/null 2>&1; then apk add --no-cache curl ca-certificates bash
-          elif command -v dnf >/dev/null 2>&1; then dnf install -y curl ca-certificates bash
-          elif command -v yum >/dev/null 2>&1; then yum install -y curl ca-certificates bash
-          elif command -v zypper >/dev/null 2>&1; then zypper -n install curl ca-certificates bash
+            { $SUDO apt-get update -qq && DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y -qq curl ca-certificates bash; } || true
+          elif command -v apk >/dev/null 2>&1; then $SUDO apk add --no-cache curl ca-certificates bash || true
+          elif command -v dnf >/dev/null 2>&1; then $SUDO dnf install -y curl ca-certificates bash || true
+          elif command -v yum >/dev/null 2>&1; then $SUDO yum install -y curl ca-certificates bash || true
+          elif command -v zypper >/dev/null 2>&1; then $SUDO zypper -n install curl ca-certificates bash || true
           fi
+          exit 0
 
       - name: Checkout code
         uses: crashappsec/action-checkout@main
@@ -700,15 +832,26 @@ jobs:
     steps:
       - name: Install curl/bash for action-checkout (racecar; ungated, both arms)
         shell: sh
+        # Best-effort probe, never a gate. Inside a container job running as a
+        # non-root user, apt-get cannot write /var/lib/apt/lists and exits 100,
+        # which failed ardupilot's build job at step 3 before any of its own work
+        # ran. GitHub uses `sh -e`, so a failing command aborts the script and a
+        # trailing `exit 0` would never be reached -- hence `|| true` per branch
+        # plus continue-on-error. If curl/bash are genuinely missing,
+        # action-checkout fails next with a message that names the real problem.
+        continue-on-error: true
         run: |
           command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1 && exit 0
+          SUDO=
+          if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then SUDO=sudo; fi
           if command -v apt-get >/dev/null 2>&1; then
-            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl ca-certificates bash
-          elif command -v apk >/dev/null 2>&1; then apk add --no-cache curl ca-certificates bash
-          elif command -v dnf >/dev/null 2>&1; then dnf install -y curl ca-certificates bash
-          elif command -v yum >/dev/null 2>&1; then yum install -y curl ca-certificates bash
-          elif command -v zypper >/dev/null 2>&1; then zypper -n install curl ca-certificates bash
+            { $SUDO apt-get update -qq && DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y -qq curl ca-certificates bash; } || true
+          elif command -v apk >/dev/null 2>&1; then $SUDO apk add --no-cache curl ca-certificates bash || true
+          elif command -v dnf >/dev/null 2>&1; then $SUDO dnf install -y curl ca-certificates bash || true
+          elif command -v yum >/dev/null 2>&1; then $SUDO yum install -y curl ca-certificates bash || true
+          elif command -v zypper >/dev/null 2>&1; then $SUDO zypper -n install curl ca-certificates bash || true
           fi
+          exit 0
 
       - name: Checkout code
         uses: crashappsec/action-checkout@main
