@@ -11,13 +11,12 @@
 name: Semgrep
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "develop" ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "develop" ]
-  schedule:
-    - cron: '23 2 * * 4'
 
 permissions:
   contents: read
